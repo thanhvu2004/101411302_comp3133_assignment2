@@ -2,16 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router'; 
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
   employees: any[] = [];
+  filteredEmployees: any[] = [];
+  searchQuery: string = '';
   errorMessage: string = '';
 
   constructor(private http: HttpClient) {}
@@ -32,8 +35,8 @@ export class DashboardComponent implements OnInit {
               email
               gender
               designation
-              salary
               department
+              salary
             }
           }
         `,
@@ -41,11 +44,21 @@ export class DashboardComponent implements OnInit {
       .subscribe(
         (response: any) => {
           this.employees = response.data.getAllEmployees;
+          this.filteredEmployees = this.employees;
         },
         (error) => {
           this.errorMessage = 'Failed to fetch employees. Please try again later.';
         }
       );
+  }
+
+  filterEmployees() {
+    const query = this.searchQuery.toLowerCase();
+    this.filteredEmployees = this.employees.filter(
+      (employee) =>
+        employee.department.toLowerCase().includes(query) ||
+        employee.designation.toLowerCase().includes(query)
+    );
   }
 
   deleteEmployee(employeeId: string) {
@@ -55,26 +68,14 @@ export class DashboardComponent implements OnInit {
         .post('http://localhost:5000/graphql', {
           query: `
             mutation {
-              deleteEmployeeById(eid: "${employeeId}") { 
-                id 
-                first_name 
-                last_name 
-                email 
-                gender 
-                designation 
-                salary 
-                date_of_joining 
-                department 
-                employee_photo 
-                created_at 
-                updated_at 
-              }
+              deleteEmployeeById(eid: "${employeeId}")
             }
           `,
         })
         .subscribe(
-          (response: any) => {
+          () => {
             this.employees = this.employees.filter((employee) => employee.id !== employeeId);
+            this.filterEmployees();
           },
           (error) => {
             this.errorMessage = 'Failed to delete employee. Please try again later.';
