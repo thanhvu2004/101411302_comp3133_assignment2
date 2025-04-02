@@ -1,0 +1,76 @@
+<div class="container mt-4">
+    <h2 class="text-center mb-4">{{ isEditMode ? 'Edit Employee' : 'Add Employee' }}</h2>
+    <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="first_name" class="form-label">First Name</label>
+        <input
+          id="first_name"
+          formControlName="first_name"
+          type="text"
+          class="form-control"
+          placeholder="Enter first name"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="last_name" class="form-label">Last Name</label>
+        <input
+          id="last_name"
+          formControlName="last_name"
+          type="text"
+          class="form-control"
+          placeholder="Enter last name"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input
+          id="email"
+          formControlName="email"
+          type="email"
+          class="form-control"
+          placeholder="Enter email"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="gender" class="form-label">Gender</label>
+        <select id="gender" formControlName="gender" class="form-select">
+          <option value="" disabled>Select gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="designation" class="form-label">Designation</label>
+        <input
+          id="designation"
+          formControlName="designation"
+          type="text"
+          class="form-control"
+          placeholder="Enter designation"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="department" class="form-label">Department</label>
+        <input
+          id="department"
+          formControlName="department"
+          type="text"
+          class="form-control"
+          placeholder="Enter department"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="salary" class="form-label">Salary</label>
+        <input
+          id="salary"
+          formControlName="salary"
+          type="number"
+          class="form-control"
+          placeholder="Enter salary"
+        />
+      </div>
+      <button type="submit" class="btn btn-primary w-100">
+        {{ isEditMode ? 'Update Employee' : 'Add Employee' }}
+      </button>
+    </form>
+</div>

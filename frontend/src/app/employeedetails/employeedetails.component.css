@@ -1,0 +1,14 @@
+.container {
+    margin-top: 20px;
+  }
+  
+  .card {
+    margin: 20px auto;
+    max-width: 600px;
+  }
+  
+  .img-fluid {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+  }
