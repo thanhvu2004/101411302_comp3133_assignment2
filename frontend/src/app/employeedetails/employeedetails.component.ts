@@ -43,17 +43,20 @@ export class EmployeedetailsComponent implements OnInit {
         }
       }
     `;
-
-    this.http
-      .post('http://localhost:5000/graphql', { query })
-      .subscribe(
-        (response: any) => {
-          this.employee = response.data.searchEmployeeById;
-        },
-        (error) => {
-          this.errorMessage = 'Failed to fetch employee details. Please try again later.';
-          console.error('Error fetching employee details:', error);
+  
+    this.http.post('http://localhost:5000/graphql', { query }).subscribe(
+      (response: any) => {
+        this.employee = response.data.searchEmployeeById;
+  
+        // Prepend the base URL to the employee_photo if it's a relative path
+        if (this.employee && this.employee.employee_photo) {
+          this.employee.employee_photo = `http://localhost:5000${this.employee.employee_photo}`;
         }
-      );
+      },
+      (error) => {
+        this.errorMessage = 'Failed to fetch employee details. Please try again later.';
+        console.error('Error fetching employee details:', error);
+      }
+    );
   }
 }

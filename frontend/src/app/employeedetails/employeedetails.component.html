@@ -1,26 +1,36 @@
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Employee Details</h2>
-    <div *ngIf="errorMessage" class="alert alert-danger text-center">
-      {{ errorMessage }}
+  <h2 class="text-center mb-4">Employee Details</h2>
+  <div *ngIf="errorMessage" class="alert alert-danger text-center">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="employee" class="card shadow-lg">
+    <div class="card-header">
+      <h3>{{ employee.first_name }} {{ employee.last_name }} - {{ employee.id }}</h3>
     </div>
-    <div *ngIf="employee" class="card shadow-lg">
-      <div class="card-header">
-        <h3>{{ employee.first_name }} {{ employee.last_name }} - {{ employee.id }}</h3>
+    <div class="card-body">
+      <!-- Display Employee Photo -->
+      <div class="text-center mb-4">
+        <img
+          *ngIf="employee.employee_photo"
+          [src]="employee.employee_photo"
+          alt="{{ employee.first_name }}'s Photo"
+          class="img-fluid rounded"
+          style="max-width: 200px; max-height: 200px;"
+        />
       </div>
-      <div class="card-body">
-        <p><strong>Email:</strong> {{ employee.email }}</p>
-        <p><strong>Gender:</strong> {{ employee.gender }}</p>
-        <p><strong>Designation:</strong> {{ employee.designation }}</p>
-        <p><strong>Department:</strong> {{ employee.department }}</p>
-        <p><strong>Salary:</strong> {{ employee.salary | currency }}</p>
-        <p><strong>Date of Joining:</strong> {{ employee.date_of_joining | date: 'yyyy-MM-dd' }}</p>
-        <p><strong>Created At:</strong> {{ employee.created_at | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
-        <p><strong>Updated At:</strong> {{ employee.updated_at | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
-      </div>
-    </div>
-    <div class="text-center mt-4">
-      <button class="btn btn-secondary ms-2" [routerLink]="['/dashboard']" type="button">
-        Back to Dashboard
-      </button>
+      <p><strong>Email:</strong> {{ employee.email }}</p>
+      <p><strong>Gender:</strong> {{ employee.gender }}</p>
+      <p><strong>Designation:</strong> {{ employee.designation }}</p>
+      <p><strong>Department:</strong> {{ employee.department }}</p>
+      <p><strong>Salary:</strong> {{ employee.salary | currency }}</p>
+      <p><strong>Date of Joining:</strong> {{ employee.date_of_joining | date: 'yyyy-MM-dd' }}</p>
+      <p><strong>Created At:</strong> {{ employee.created_at | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
+      <p><strong>Updated At:</strong> {{ employee.updated_at | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
     </div>
   </div>
+  <div class="text-center mt-4">
+    <button class="btn btn-secondary ms-2" [routerLink]="['/dashboard']" type="button">
+      Back to Dashboard
+    </button>
+  </div>
+</div>

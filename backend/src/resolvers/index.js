@@ -2,8 +2,20 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Employee = require("../models/Employee");
 const User = require("../models/User");
+const path = require("path");
+const fs = require("fs");
 
 const SECRET_KEY = "l2exCMTKWB";
+
+const deleteFile = (filePath) => {
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error(`Failed to delete file: ${filePath}`, err);
+    } else {
+      console.log(`File deleted: ${filePath}`);
+    }
+  });
+};
 
 const resolvers = {
   Query: {
@@ -77,6 +89,7 @@ const resolvers = {
         date_of_joining: args.date_of_joining,
         department: args.department,
         employee_photo: args.employee_photo,
+        created_at: new Date(),
       });
       return employee.save();
     },
@@ -93,12 +106,34 @@ const resolvers = {
           date_of_joining: args.date_of_joining,
           department: args.department,
           employee_photo: args.employee_photo,
+          updated_at: new Date(),
         },
         { new: true }
       );
     },
-    deleteEmployeeById: (parent, args) => {
-      return Employee.findByIdAndDelete(args.eid);
+    deleteEmployeeById: async (parent, args) => {
+      try {
+        // Find the employee by ID
+        const employee = await Employee.findById(args.eid);
+
+        if (!employee) {
+          throw new Error("Employee not found");
+        }
+
+        // Delete the associated photo file if it exists
+        if (employee.employee_photo) {
+          const photoPath = path.join(__dirname, "..", employee.employee_photo); // Correctly resolve the path
+          deleteFile(photoPath);
+        }
+
+        // Delete the employee record
+        await Employee.findByIdAndDelete(args.eid);
+
+        return "Employee deleted successfully";
+      } catch (error) {
+        console.error("Error deleting employee:", error);
+        throw new Error("Failed to delete employee");
+      }
     },
   },
 };
