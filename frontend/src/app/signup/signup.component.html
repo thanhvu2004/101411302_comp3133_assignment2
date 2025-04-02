@@ -1,0 +1,67 @@
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card p-4 shadow-lg" style="width: 400px;">
+    <h2 class="text-center mb-4">Signup</h2>
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input
+          id="username"
+          formControlName="username"
+          type="text"
+          class="form-control"
+          placeholder="Enter your username"
+        />
+        <div
+          *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched"
+          class="text-danger mt-1"
+        >
+          Username is required.
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input
+          id="email"
+          formControlName="email"
+          type="email"
+          class="form-control"
+          placeholder="Enter your email"
+        />
+        <div
+          *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
+          class="text-danger mt-1"
+        >
+          A valid email is required.
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          id="password"
+          formControlName="password"
+          type="password"
+          class="form-control"
+          placeholder="Enter your password"
+        />
+        <div
+          *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
+          class="text-danger mt-1"
+        >
+          Password must be at least 6 characters long.
+        </div>
+      </div>
+      <button
+        type="submit"
+        class="btn btn-primary w-100"
+        [disabled]="signupForm.invalid || isSubmitting"
+      >
+        Signup
+      </button>
+      <div *ngIf="errorMessage" class="text-danger text-center mt-3">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="text-success text-center mt-3">{{ successMessage }}</div>
+      <p class="text-center mt-3">
+        Already have an account? <a routerLink="/login">Login here</a>
+      </p>
+    </form>
+  </div>
+</div>

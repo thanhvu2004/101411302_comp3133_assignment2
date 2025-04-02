@@ -8,11 +8,9 @@ const SECRET_KEY = "l2exCMTKWB";
 const resolvers = {
   Query: {
     login: async (parent, args) => {
+      const usernameOrEmail = args.usernameOrEmail.toLowerCase();
       const user = await User.findOne({
-        $or: [
-          { username: args.usernameOrEmail },
-          { email: args.usernameOrEmail },
-        ],
+        $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
       });
       if (!user) {
         throw new Error("User not found");
@@ -43,16 +41,18 @@ const resolvers = {
   },
   Mutation: {
     signup: async (parent, args) => {
+      const username = args.username.toLowerCase();
+      const email = args.email.toLowerCase();
       const existingUser = await User.findOne({
-        $or: [{ username: args.username }, { email: args.email }],
+        $or: [{ username: username }, { email: email }],
       });
       if (existingUser) {
         throw new Error("Username or email already exists");
       }
       const hashedPassword = await bcrypt.hash(args.password, 12);
       const user = new User({
-        username: args.username,
-        email: args.email,
+        username: username,
+        email: email,
         password: hashedPassword,
         created_at: new Date(),
       });

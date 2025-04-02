@@ -1,12 +1,42 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Employee Management App</a>
-        <button
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">Employee Management App</a>
+    <div>
+      <!-- Show Login and Signup buttons when not logged in -->
+      <button
+        *ngIf="!isLoggedIn"
         class="btn btn-outline-primary"
         routerLink="/login"
         type="button"
-        >
+      >
         Login
-        </button>
+      </button>
+      <button
+        *ngIf="!isLoggedIn"
+        class="btn btn-outline-primary ms-2"
+        routerLink="/signup"
+        type="button"
+      >
+        Signup
+      </button>
+
+      <!-- Show Logout and Dashboard buttons when logged in -->
+      <button
+        *ngIf="isLoggedIn"
+        class="btn btn-outline-danger ms-2"
+        (click)="logout()"
+        type="button"
+      >
+        Logout
+      </button>
+      <button
+        *ngIf="isLoggedIn"
+        class="btn btn-outline-primary ms-2"
+        routerLink="/dashboard"
+        type="button"
+      >
+        Dashboard
+      </button>
     </div>
+  </div>
 </nav>

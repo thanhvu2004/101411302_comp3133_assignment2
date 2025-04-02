@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const { graphqlHTTP } = require("express-graphql");
 const mongoose = require("mongoose");
 const schema = require("./schemas/employeeSchema");
@@ -24,6 +25,17 @@ mongoose
 
 // Middleware
 app.use(express.json());
+
+// Enable CORS
+app.use(
+  cors({
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// GraphQL endpoint
 app.use(
   "/graphql",
   graphqlHTTP({
@@ -32,6 +44,7 @@ app.use(
   })
 );
 
+// Start the server
 app.listen(5000, () => {
   console.log(`Server is running on port 5000`);
 });
