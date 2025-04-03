@@ -1,8 +1,10 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { UserService } from '../services/user.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -11,15 +13,22 @@ import { RouterModule } from '@angular/router';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   isLoggedIn: boolean = false;
+  private loginStatusSubscription!: Subscription;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private router: Router
+    private router: Router,
+    private userService: UserService
   ) {}
 
   ngOnInit() {
+    this.loginStatusSubscription = this.userService.getLoginStatus().subscribe(
+      (status) => {
+        this.isLoggedIn = status;
+      }
+    );
     this.checkLoginStatus();
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
@@ -43,9 +52,14 @@ export class NavbarComponent implements OnInit {
 
   logout() {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('token');
-      this.isLoggedIn = false;
+      this.userService.removeToken();
       this.router.navigate(['/login']);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.loginStatusSubscription) {
+      this.loginStatusSubscription.unsubscribe();
     }
   }
 }

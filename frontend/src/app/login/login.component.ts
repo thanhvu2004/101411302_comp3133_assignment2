@@ -30,11 +30,11 @@ export class LoginComponent {
       this.userService.login(usernameOrEmail, password).subscribe(
         (response: any) => {
           const token = response.data.login;
-          localStorage.setItem('token', token);
+          this.userService.setToken(token);
           this.router.navigate(['/dashboard']);
         },
         (error) => {
-          this.isSubmitting = false; // Re-enable the button if there's an error
+          this.isSubmitting = false;
           this.errorMessage = 'Invalid username/email or password.';
         }
       );
