@@ -68,14 +68,20 @@ export class DashboardComponent implements OnInit {
         .post('http://localhost:5000/graphql', {
           query: `
             mutation {
-              deleteEmployeeById(eid: "${employeeId}")
+              deleteEmployeeById(eid: "${employeeId}") {
+                id
+              }
             }
           `,
         })
         .subscribe(
-          () => {
-            this.employees = this.employees.filter((employee) => employee.id !== employeeId);
-            this.filterEmployees();
+          (response: any) => {
+            if (response.data && response.data.deleteEmployeeById) {
+              this.employees = this.employees.filter((employee) => employee.id !== employeeId);
+              this.filterEmployees();
+            } else {
+              this.errorMessage = 'Failed to delete employee. Please try again later.';
+            }
           },
           (error) => {
             this.errorMessage = 'Failed to delete employee. Please try again later.';
