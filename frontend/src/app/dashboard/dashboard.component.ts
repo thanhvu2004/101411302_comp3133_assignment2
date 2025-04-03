@@ -17,7 +17,7 @@ export class DashboardComponent implements OnInit {
   searchQuery: string = '';
   errorMessage: string = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   ngOnInit() {
     this.fetchEmployees();
