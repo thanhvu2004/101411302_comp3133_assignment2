@@ -35,6 +35,7 @@ docker-compose up --build
 ### 3. Access the Application
 - Frontend: Open your browser and navigate to http://localhost:4200.
 - Backend: The backend server runs on http://localhost:5000.
+- A test user to access the app: `conorle` - `password`
 
 ## Project Structure
 ```bash
