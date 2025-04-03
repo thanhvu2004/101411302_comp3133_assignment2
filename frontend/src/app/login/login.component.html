@@ -34,7 +34,7 @@
             Password must be at least 6 characters long.
           </div>
         </div>
-        <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid">Login</button>
+        <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid || isSubmitting">Login</button>
         <div *ngIf="errorMessage" class="text-danger text-center mt-3">{{ errorMessage }}</div>
         <p class="text-center mt-3">
           Don't have an account? <a routerLink="/signup">Signup here</a>

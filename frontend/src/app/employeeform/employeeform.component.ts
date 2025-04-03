@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { EmployeeService } from '../services/employee.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-employeeform',
@@ -19,6 +20,7 @@ export class EmployeeFormComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private employeeService: EmployeeService,
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router
@@ -45,32 +47,18 @@ export class EmployeeFormComponent implements OnInit {
   }
 
   loadEmployeeData(employeeId: string) {
-    this.http
-      .post('http://localhost:5000/graphql', {
-        query: `
-          query {
-            searchEmployeeById(eid: "${employeeId}") {
-              first_name
-              last_name
-              email
-              gender
-              designation
-              department
-              salary
-              date_of_joining
-              employee_photo
-            }
-          }
-        `,
-      })
-      .subscribe((response: any) => {
+    this.employeeService.searchEmployeeById(employeeId).subscribe(
+      (response: any) => {
         const employee = response.data.searchEmployeeById;
         this.employeeForm.patchValue(employee);
-        // If the photo exists, set it for display
         if (employee.employee_photo) {
           this.selectedFile = null; // Reset the selected file
         }
-      });
+      },
+      (error) => {
+        console.error('Error fetching employee details:', error);
+      }
+    );
   }
 
   onFileChange(event: Event) {
@@ -78,14 +66,14 @@ export class EmployeeFormComponent implements OnInit {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
-  
+
       if (!allowedExtensions.exec(file.name)) {
-        alert("Only image files (jpg, jpeg, png, gif) are allowed.");
-        input.value = ""; // Clear the input
+        alert('Only image files (jpg, jpeg, png, gif) are allowed.');
+        input.value = ''; // Clear the input
         this.selectedFile = null;
         return;
       }
-  
+
       this.selectedFile = file;
       this.employeeForm.patchValue({ employee_photo: this.selectedFile.name });
     }
@@ -95,23 +83,22 @@ export class EmployeeFormComponent implements OnInit {
     if (this.employeeForm.valid) {
       const formData = new FormData();
       let filePath = this.employeeForm.value.employee_photo; // Default to the existing photo
-  
+
       if (this.selectedFile) {
-        formData.append("employee_photo", this.selectedFile);
+        formData.append('employee_photo', this.selectedFile);
 
         if (this.isEditMode && this.employeeId) {
-          formData.append("employeeId", this.employeeId);
+          formData.append('employeeId', this.employeeId);
         }
-  
+
         // Upload the file first
-        this.http.post("http://localhost:5000/upload", formData).subscribe(
+        this.http.post('http://localhost:5000/upload', formData).subscribe(
           (response: any) => {
             filePath = response.filePath; // Update the file path after upload
-  
             this.submitGraphQLMutation(filePath);
           },
           (error) => {
-            console.error("File upload error:", error);
+            console.error('File upload error:', error);
           }
         );
       } else {
@@ -122,52 +109,31 @@ export class EmployeeFormComponent implements OnInit {
       this.employeeForm.markAllAsTouched();
     }
   }
-  
-  submitGraphQLMutation(filePath: string) {  
-    const mutation = this.isEditMode
-      ? `
-        mutation {
-          updateEmployeeById(
-            eid: "${this.employeeId}",
-            first_name: "${this.employeeForm.value.first_name}",
-            last_name: "${this.employeeForm.value.last_name}",
-            email: "${this.employeeForm.value.email}",
-            gender: "${this.employeeForm.value.gender}",
-            designation: "${this.employeeForm.value.designation}",
-            department: "${this.employeeForm.value.department}",
-            salary: ${this.employeeForm.value.salary},
-            date_of_joining: "${this.employeeForm.value.date_of_joining}",
-            employee_photo: "${filePath}",
-          ) {
-            id
-          }
+
+  submitGraphQLMutation(filePath: string) {
+    const employeeData = {
+      ...this.employeeForm.value,
+      employee_photo: filePath,
+    };
+
+    if (this.isEditMode && this.employeeId) {
+      this.employeeService.updateEmployeeById(this.employeeId, employeeData).subscribe(
+        () => {
+          this.router.navigate(['/dashboard']);
+        },
+        (error) => {
+          console.error('Error updating employee:', error);
         }
-      `
-      : `
-        mutation {
-          addEmployee(
-            first_name: "${this.employeeForm.value.first_name}",
-            last_name: "${this.employeeForm.value.last_name}",
-            email: "${this.employeeForm.value.email}",
-            gender: "${this.employeeForm.value.gender}",
-            designation: "${this.employeeForm.value.designation}",
-            department: "${this.employeeForm.value.department}",
-            salary: ${this.employeeForm.value.salary},
-            date_of_joining: "${this.employeeForm.value.date_of_joining}",
-            employee_photo: "${filePath}",
-          ) {
-            id
-          }
+      );
+    } else {
+      this.employeeService.addEmployee(employeeData).subscribe(
+        () => {
+          this.router.navigate(['/dashboard']);
+        },
+        (error) => {
+          console.error('Error adding employee:', error);
         }
-      `;
-  
-    this.http.post("http://localhost:5000/graphql", { query: mutation }).subscribe(
-      () => {
-        this.router.navigate(["/dashboard"]);
-      },
-      (error) => {
-        console.error("Error:", error);
-      }
-    );
+      );
+    }
   }
 }

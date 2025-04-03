@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { EmployeeService } from '../services/employee.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router'; 
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -17,39 +17,22 @@ export class DashboardComponent implements OnInit {
   searchQuery: string = '';
   errorMessage: string = '';
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly employeeService: EmployeeService) {}
 
   ngOnInit() {
     this.fetchEmployees();
   }
 
   fetchEmployees() {
-    this.http
-      .post('http://localhost:5000/graphql', {
-        query: `
-          query {
-            getAllEmployees {
-              id
-              first_name
-              last_name
-              email
-              gender
-              designation
-              department
-              salary
-            }
-          }
-        `,
-      })
-      .subscribe(
-        (response: any) => {
-          this.employees = response.data.getAllEmployees;
-          this.filteredEmployees = this.employees;
-        },
-        (error) => {
-          this.errorMessage = 'Failed to fetch employees. Please try again later.';
-        }
-      );
+    this.employeeService.fetchEmployees().subscribe(
+      (response: any) => {
+        this.employees = response.data.getAllEmployees;
+        this.filteredEmployees = this.employees;
+      },
+      (error) => {
+        this.errorMessage = 'Failed to fetch employees. Please try again later.';
+      }
+    );
   }
 
   filterEmployees() {
@@ -64,29 +47,19 @@ export class DashboardComponent implements OnInit {
   deleteEmployee(employeeId: string) {
     const confirmDelete = window.confirm('Are you sure you want to delete this employee?');
     if (confirmDelete) {
-      this.http
-        .post('http://localhost:5000/graphql', {
-          query: `
-            mutation {
-              deleteEmployeeById(eid: "${employeeId}") {
-                id
-              }
-            }
-          `,
-        })
-        .subscribe(
-          (response: any) => {
-            if (response.data && response.data.deleteEmployeeById) {
-              this.employees = this.employees.filter((employee) => employee.id !== employeeId);
-              this.filterEmployees();
-            } else {
-              this.errorMessage = 'Failed to delete employee. Please try again later.';
-            }
-          },
-          (error) => {
+      this.employeeService.deleteEmployee(employeeId).subscribe(
+        (response: any) => {
+          if (response.data && response.data.deleteEmployeeById) {
+            this.employees = this.employees.filter((employee) => employee.id !== employeeId);
+            this.filterEmployees();
+          } else {
             this.errorMessage = 'Failed to delete employee. Please try again later.';
           }
-        );
+        },
+        (error) => {
+          this.errorMessage = 'Failed to delete employee. Please try again later.';
+        }
+      );
     }
   }
 }
