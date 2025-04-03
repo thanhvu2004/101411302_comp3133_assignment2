@@ -26,11 +26,7 @@ export class UserService {
           username: "${userData.username}",
           email: "${userData.email}",
           password: "${userData.password}"
-        ) {
-          id
-          username
-          email
-        }
+        )
       }
     `;
     return this.http.post(this.apiUrl, { query: mutation });
